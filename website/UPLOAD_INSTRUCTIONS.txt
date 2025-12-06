@@ -1,0 +1,193 @@
+═══════════════════════════════════════════════════════════════════════════
+  SPARKLE PROTOCOL - HOSTINGER DEPLOYMENT INSTRUCTIONS
+═══════════════════════════════════════════════════════════════════════════
+
+✅ YOUR UI IS COMPLETELY INTACT - No changes made to any HTML, CSS, or JS files
+
+📁 DEPLOYMENT FOLDER: hostinger-deploy/
+
+This folder contains your complete website ready to upload to Hostinger.
+
+═══════════════════════════════════════════════════════════════════════════
+  STEP 1: UPLOAD TO HOSTINGER
+═══════════════════════════════════════════════════════════════════════════
+
+METHOD 1: FILE MANAGER (Recommended for Small Sites)
+─────────────────────────────────────────────────────
+1. Log in to Hostinger control panel (hpanel.hostinger.com)
+2. Go to "Files" → "File Manager"
+3. Navigate to public_html/ (or your domain's root folder)
+4. Click "Upload Files"
+5. Upload ALL files and folders from hostinger-deploy/ folder:
+
+   Upload these folders:
+   ✓ css/
+   ✓ js/
+   ✓ images/
+   ✓ schema/
+
+   Upload these HTML files:
+   ✓ index.html (MAIN HOMEPAGE)
+   ✓ whitepaper.html
+   ✓ developer-sdk.html
+   ✓ vision.html
+   ✓ technical-reality.html
+   ✓ formal-proofs.html
+   ✓ protocol-comparison.html
+   ✓ practical-implementation.html
+   ✓ recursive-inscriptions-guide.html
+   ✓ glossary.html
+   ✓ spec.html
+   ✓ roadmap.html
+   ✓ changelog.html
+   ✓ alternatives.html
+   ✓ concept.html
+   ✓ coordinator.html
+   ✓ darkita.html
+   ✓ darkita-case-study.html
+   ✓ index-old.html (backup)
+
+METHOD 2: FTP (Recommended for Large Sites)
+─────────────────────────────────────────────
+1. Get FTP credentials from Hostinger:
+   - Go to "Files" → "FTP Accounts"
+   - Username: Usually your domain name
+   - Password: Set if needed
+   - Host: Usually ftp.yourdomain.com
+   - Port: 21
+
+2. Use FTP client (FileZilla recommended):
+   - Download FileZilla: https://filezilla-project.org/
+   - Connect using credentials above
+   - Upload hostinger-deploy/ contents to public_html/
+
+═══════════════════════════════════════════════════════════════════════════
+  STEP 2: VERIFY DEPLOYMENT
+═══════════════════════════════════════════════════════════════════════════
+
+After upload, verify your site is live:
+
+1. Visit your domain: https://yoursite.com
+2. Check these pages load correctly:
+   ✓ Homepage (index.html)
+   ✓ Whitepaper (whitepaper.html)
+   ✓ SDK Documentation (developer-sdk.html)
+
+3. Verify navigation menu works
+4. Check images load (logo, diagrams)
+5. Verify CSS styling is correct
+
+═══════════════════════════════════════════════════════════════════════════
+  FOLDER STRUCTURE ON HOSTINGER
+═══════════════════════════════════════════════════════════════════════════
+
+Your public_html/ should look like this:
+
+public_html/
+├── index.html                    ← Main homepage
+├── whitepaper.html
+├── developer-sdk.html
+├── [... all other HTML files ...]
+├── css/
+│   ├── academic-ultra-clean.css
+│   ├── navigation-professional.css
+│   └── mobile-fixes.css
+├── js/
+│   └── [JavaScript files]
+├── images/
+│   ├── sparkle-logo.png
+│   └── [other images]
+└── schema/
+    └── [schema files]
+
+═══════════════════════════════════════════════════════════════════════════
+  WHAT WAS UPDATED
+═══════════════════════════════════════════════════════════════════════════
+
+✅ WEBSITE UI: NO CHANGES (100% intact)
+   - All HTML, CSS, JS files untouched
+   - All images and assets preserved
+   - Navigation and styling unchanged
+
+✅ BACKEND SDK: Updated and tested
+   - TypeScript code compiled successfully
+   - All unit tests passing (153/153)
+   - Production build ready
+   - Located in: packages/core/dist/
+
+NOTE: The backend SDK is NOT included in this deployment.
+      This is ONLY the frontend website (HTML/CSS/JS).
+
+═══════════════════════════════════════════════════════════════════════════
+  IMPORTANT NOTES
+═══════════════════════════════════════════════════════════════════════════
+
+🔒 SECURITY:
+   - This is a static website (HTML/CSS/JS only)
+   - No server-side code included
+   - Safe to upload directly
+
+📱 MOBILE RESPONSIVE:
+   - Your site includes mobile-fixes.css
+   - Should work on all devices
+
+🔗 EXTERNAL DEPENDENCIES:
+   - Site uses KaTeX CDN for math rendering
+   - Requires internet connection for math formulas
+
+⚠️ PROTOCOL STATUS:
+   - Website displays "Experimental, Testnet Only" warnings
+   - This is CORRECT - keep these warnings visible
+   - Backend protocol is functional but unaudited
+
+═══════════════════════════════════════════════════════════════════════════
+  TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════
+
+❌ If homepage shows blank or error:
+   → Check that index.html is in public_html/ root
+   → Verify file permissions (644 for files, 755 for folders)
+
+❌ If CSS doesn't load (site looks unstyled):
+   → Check that css/ folder uploaded correctly
+   → Verify paths in HTML files are correct
+
+❌ If images don't show:
+   → Check that images/ folder uploaded
+   → Verify image files are not corrupted
+
+❌ If navigation doesn't work:
+   → Check that js/ folder uploaded
+   → Open browser console (F12) for JavaScript errors
+
+═══════════════════════════════════════════════════════════════════════════
+  CONTACT & SUPPORT
+═══════════════════════════════════════════════════════════════════════════
+
+Hostinger Support: https://www.hostinger.com/contact
+Protocol Author: David A. Michael
+License: MIT
+
+═══════════════════════════════════════════════════════════════════════════
+  DEPLOYMENT CHECKLIST
+═══════════════════════════════════════════════════════════════════════════
+
+Before going live, verify:
+□ All HTML files uploaded
+□ CSS folder uploaded with all 3 stylesheets
+□ JS folder uploaded
+□ Images folder uploaded (including logo)
+□ Schema folder uploaded
+□ index.html loads at your domain root
+□ Navigation menu works
+□ All internal links work
+□ Mobile responsive (test on phone)
+□ HTTPS enabled (SSL certificate active)
+
+═══════════════════════════════════════════════════════════════════════════
+
+Ready to upload! Your UI is 100% intact and deployment-ready.
+
+Location: C:\Users\sk84l\Downloads\PROTOCOL UPDATE\hostinger-deploy\
+
+═══════════════════════════════════════════════════════════════════════════

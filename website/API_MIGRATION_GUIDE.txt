@@ -1,0 +1,230 @@
+═══════════════════════════════════════════════════════════════════════════
+  SPARKLE PROTOCOL API MIGRATION GUIDE
+  v1.1.0 → v1.1.1 (Security Update)
+═══════════════════════════════════════════════════════════════════════════
+
+⚠️ BREAKING CHANGE: BigInt amounts must be sent as strings in JSON
+
+═══════════════════════════════════════════════════════════════════════════
+  WHY THIS CHANGE?
+═══════════════════════════════════════════════════════════════════════════
+
+JavaScript's Number type can only safely represent integers up to 2^53-1
+(9,007,199,254,740,991). Bitcoin amounts in satoshis can exceed this limit,
+causing silent precision loss when parsed by JSON.parse().
+
+Example vulnerability:
+  JSON.parse('{"amount": 9007199254740993}')
+  → Returns: 9007199254740992 (WRONG! Lost 1 satoshi)
+
+This could cause:
+  - Signature verification failures
+  - Incorrect transaction amounts
+  - Potential fund loss
+
+═══════════════════════════════════════════════════════════════════════════
+  MIGRATION STEPS
+═══════════════════════════════════════════════════════════════════════════
+
+STEP 1: Update JSON Payloads
+─────────────────────────────────────────────────────────────────────────
+
+BEFORE (v1.1.0 - UNSAFE):
+```json
+{
+  "amount": 1000000,
+  "premium": 5000,
+  "durationBlocks": 144
+}
+```
+
+AFTER (v1.1.1 - SAFE):
+```json
+{
+  "amount": "1000000",
+  "premium": "5000",
+  "durationBlocks": 144
+}
+```
+
+STEP 2: Update JavaScript/TypeScript Code
+─────────────────────────────────────────────────────────────────────────
+
+BEFORE:
+```javascript
+const swapRequest = {
+  amount: 1000000,
+  premium: 5000,
+  durationBlocks: 144
+};
+
+fetch('/api/v1/swaps', {
+  method: 'POST',
+  body: JSON.stringify(swapRequest)
+});
+```
+
+AFTER:
+```javascript
+const swapRequest = {
+  amount: "1000000",        // ✅ String
+  premium: "5000",          // ✅ String
+  durationBlocks: 144       // ✓ Regular number OK
+};
+
+fetch('/api/v1/swaps', {
+  method: 'POST',
+  body: JSON.stringify(swapRequest)
+});
+```
+
+STEP 3: Update Response Parsing
+─────────────────────────────────────────────────────────────────────────
+
+Server will now return amounts as strings:
+
+BEFORE:
+```javascript
+const response = await fetch('/api/v1/swaps/123');
+const swap = await response.json();
+console.log(swap.amount); // number
+```
+
+AFTER:
+```javascript
+const response = await fetch('/api/v1/swaps/123');
+const swap = await response.json();
+console.log(swap.amount);        // "1000000" (string)
+const amountNum = BigInt(swap.amount); // Convert to BigInt
+```
+
+═══════════════════════════════════════════════════════════════════════════
+  AFFECTED API ENDPOINTS
+═══════════════════════════════════════════════════════════════════════════
+
+POST /api/v1/swaps
+  Request body changes:
+    - amount: number → string
+    - premium: number → string
+
+  Response changes:
+    - amount: number → string
+    - premium: number → string
+
+GET /api/v1/swaps/:id
+  Response changes:
+    - amount: number → string
+    - premium: number → string
+    - actualAmount: number → string
+
+POST /api/v1/invoices/validate
+  Request body changes:
+    - expectedAmount: number → string
+
+═══════════════════════════════════════════════════════════════════════════
+  BACKWARD COMPATIBILITY
+═══════════════════════════════════════════════════════════════════════════
+
+❌ NOT BACKWARD COMPATIBLE
+
+Old clients (v1.1.0) will fail with validation errors when sending numbers.
+You MUST update clients to v1.1.1 or later.
+
+Migration timeline:
+  - Testnet: Update immediately
+  - Mainnet: Grace period ends [YOUR_DATE_HERE]
+
+═══════════════════════════════════════════════════════════════════════════
+  TESTING YOUR MIGRATION
+═══════════════════════════════════════════════════════════════════════════
+
+1. Update your code to send amounts as strings
+2. Test with edge cases:
+
+   Test Case 1: Large amounts (> 2^53)
+   ```json
+   {"amount": "9007199254740993"}
+   ```
+
+   Test Case 2: Small amounts
+   ```json
+   {"amount": "546"}
+   ```
+
+   Test Case 3: Zero-leading (should fail)
+   ```json
+   {"amount": "0001000"}  // ❌ Should be rejected
+   ```
+
+3. Verify error handling for invalid formats:
+   ```json
+   {"amount": 1000000}    // ❌ Number (should fail)
+   {"amount": "1000.5"}   // ❌ Decimal (should fail)
+   {"amount": "-1000"}    // ❌ Negative (should fail)
+   ```
+
+═══════════════════════════════════════════════════════════════════════════
+  EXAMPLE: Complete Swap Creation
+═══════════════════════════════════════════════════════════════════════════
+
+```javascript
+// Create a swap with proper string amounts
+async function createSwap() {
+  const swapRequest = {
+    amount: "1000000",              // 0.01 BTC (string)
+    premium: "5000",                // 5000 sats (string)
+    durationBlocks: 144,            // 1 day (number OK)
+    takerPubkey: "02abc123...",     // Compressed pubkey
+    providerPubkey: "03def456...",
+    paymentHash: "a1b2c3..."        // SHA256 hash
+  };
+
+  const response = await fetch('http://localhost:3000/api/v1/swaps', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(swapRequest)
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    console.error('Swap creation failed:', error);
+    return;
+  }
+
+  const swap = await response.json();
+
+  // Parse BigInt amounts from response
+  const swapAmount = BigInt(swap.amount);
+  const swapPremium = BigInt(swap.premium);
+
+  console.log('Swap created:');
+  console.log('  ID:', swap.id);
+  console.log('  Amount:', swapAmount, 'sats');
+  console.log('  Premium:', swapPremium, 'sats');
+}
+```
+
+═══════════════════════════════════════════════════════════════════════════
+  SDK UPDATES
+═══════════════════════════════════════════════════════════════════════════
+
+If using the official TypeScript SDK:
+
+npm install @sparkle-protocol/core@^1.1.1
+
+The SDK automatically handles string conversion internally.
+
+═══════════════════════════════════════════════════════════════════════════
+  QUESTIONS?
+═══════════════════════════════════════════════════════════════════════════
+
+- Documentation: https://sparkleprotocol.com/developer-sdk.html
+- Security Update: https://sparkleprotocol.com/SECURITY_UPDATE.html
+- GitHub Issues: https://github.com/your-repo/sparkle-protocol
+
+═══════════════════════════════════════════════════════════════════════════
+
+Updated: December 3, 2025
+Version: v1.1.1
